@@ -27,7 +27,7 @@ jobs:
           . $IDF_PATH/export.sh
           idf.py build
       
-      - name: Upload firmware artifact
+      - name: Upload binaries artifact
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware
