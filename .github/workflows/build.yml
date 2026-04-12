@@ -33,7 +33,7 @@ jobs:
 
 # CPPCHECK
 
-lint:
+  lint:
     name: Static Analysis (cppcheck)
     runs-on: ubuntu-latest
 
