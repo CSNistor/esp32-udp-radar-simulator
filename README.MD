@@ -1,7 +1,7 @@
 # RadarManager-ESP32
 
 [![Build Status](https://github.com/CSNistor/esp32-udp-radar-simulator/actions/workflows/build.yml/badge.svg)](https://github.com/CSNistor/esp32-udp-radar-simulator/actions)
-[![ESP-IDF](https://img.shields.io/badge/ESP--IDF-v5.1-blue)]()
+[![ESP-IDF](https://img.shields.io/badge/ESP--IDF-v6.0-blue)](https://docs.espressif.com/projects/esp-idf/en/v6.0/)
 
 A C++ learning project built on ESP32 using ESP-IDF, focused on embedded networking and AUTOSAR Adaptive-style design concepts.
 
