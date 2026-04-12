@@ -29,3 +29,29 @@ jobs:
           path: |
             build/*.bin
             build/*.elf
+
+
+# CPPCHECK
+
+lint:
+    name: Static Analysis (cppcheck)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck \
+            --enable=warning,style,performance,portability \
+            --inconclusive \
+            --std=c++17 \
+            --error-exitcode=1 \
+            --inline-suppr \
+            include src main
