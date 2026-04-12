@@ -3,11 +3,7 @@
 #include "WiFi.hpp"
 #include "UdpSender.hpp"
 #include "nvs_flash.h"
-
-constexpr const char *WIFI_SSID = "YOUR_WIFI_SSID";
-constexpr const char *WIFI_PASS = "YOUR_WIFI_PASSWORD";
-constexpr const char *DEST_IP = "DESTINATION_IP";
-constexpr uint16_t DEST_PORT = 5000;
+#include "Config.hpp"
 
 extern "C" void app_main(void)
 {
@@ -23,15 +19,44 @@ extern "C" void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
     ESP_LOGI(TAG, "NVS succesfully initialized!");
+
+    if (radar::config::WIFI_SSID[0] == '\0')
+    {
+        ESP_LOGE(TAG, "Wi-Fi SSID is empty");
+        return;
+    }
+
+    if (radar::config::WIFI_PASS[0] == '\0')
+    {
+        ESP_LOGE(TAG, "Wi-Fi password is empty");
+        return;
+    }
+
+    if (radar::config::DEST_IP[0] == '\0')
+    {
+        ESP_LOGE(TAG, "Destination IP is empty");
+        return;
+    }
+
+    if (radar::config::DEST_PORT == 0)
+    {
+        ESP_LOGE(TAG, "Destination port is invalid");
+        return;
+    }
+
     ESP_LOGI(TAG, "initializing Wi-Fi");
-    static radar::WiFiStation wifi(WIFI_SSID, WIFI_PASS);
+    static radar::WiFiStation wifi(
+        radar::config::WIFI_SSID,
+        radar::config::WIFI_PASS);
     if (!wifi.connect())
     {
         ESP_LOGE(TAG, "Wi-Fi connection failed");
         return;
     }
 
-    static radar::UdpSender sender(DEST_IP, DEST_PORT);
+    static radar::UdpSender sender(
+        radar::config::DEST_IP,
+        radar::config::DEST_PORT);
 
     if (!sender.init())
     {
