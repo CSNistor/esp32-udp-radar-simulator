@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <cstddef>
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "lwip/sockets.h"
+#include "RadarSample.hpp"
 
 namespace radar
 {
@@ -28,7 +30,7 @@ namespace radar
          * @param destIp Destination IPv4 address (string format, e.g. "192.168.1.100")
          * @param destPort Destination UDP port
          */
-        UdpSender(const char *destIp, uint16_t destPort);
+        UdpSender(const char *destIp, uint16_t destPort, QueueHandle_t sampleQueue);
 
         /**
          * @brief Destroy the Udp Sender object.
@@ -114,6 +116,8 @@ namespace radar
          */
         uint16_t destPort_;
 
+        QueueHandle_t sampleQueue_;
+
         /**
          * @brief Socket file descriptor.
          */
@@ -123,11 +127,6 @@ namespace radar
          * @brief Destination socket address structure.
          */
         struct sockaddr_in destAddr_;
-
-        /**
-         * @brief Simple message counter (for testing).
-         */
-        int counter_;
     };
 
 } // namespace radar

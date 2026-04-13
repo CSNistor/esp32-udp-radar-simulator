@@ -15,11 +15,11 @@ namespace radar
 {
     static const char *TAG = "UdpSender";
 
-    UdpSender::UdpSender(const char *destIp, uint16_t destPort)
+    UdpSender::UdpSender(const char *destIp, uint16_t destPort, QueueHandle_t sampleQueue)
         : destIp_(destIp),
           destPort_(destPort),
-          sock_(-1),
-          counter_(0)
+          sampleQueue_(sampleQueue),
+          sock_(-1)
     {
         std::memset(&destAddr_, 0, sizeof(destAddr_));
     }
@@ -149,20 +149,31 @@ namespace radar
     void UdpSender::run()
     {
         ESP_LOGI(TAG, "Starting UDP sender task loop");
-
-        char buffer[64];
-
+        RadarSample sample{};
         while (true)
         {
-            int len = std::snprintf(
-                buffer,
-                sizeof(buffer),
-                "hello from esp32, counter=%d",
-                counter_++);
-
-            send(buffer, static_cast<size_t>(len));
-
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            BaseType_t result = xQueueReceive(
+                sampleQueue_,
+                &sample,
+                portMAX_DELAY);
+            if (result != pdPASS)
+            {
+                ESP_LOGE(TAG, "Failed to read radar sample from queue");
+                vTaskDelay(pdMS_TO_TICKS(100));
+                continue;
+            }
+            ESP_LOGI(TAG,
+                     "sample seq=%lu ts=%lu angle=%.2f dist=%.2f speed=%.2f obj=%u",
+                     static_cast<unsigned long>(sample.sequenceCounter),
+                     static_cast<unsigned long>(sample.timestampMs),
+                     sample.angleDeg,
+                     sample.distanceM,
+                     sample.speedMps,
+                     sample.objectId);
+            if (!send(reinterpret_cast<const char *>(&sample), sizeof(sample)))
+            {
+                ESP_LOGE(TAG, "Failed to send radar sample over UDP");
+            }
         }
     }
 
